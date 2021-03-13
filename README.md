@@ -3,7 +3,7 @@
 
 
 ----------------------------------------------------
-1 - Just create a dir called "dataset" and throw your images there (preferable to be png, but you can use other formats as long as you change [that](https://github.com/GabrielDornelles/EchidNet-OCR/blob/5275b1169051763fbb08f583871a28e88c706454/train.py#L56)
+1 - Just create a dir called "dataset" and throw your images there (preferable to be png, but you can use other formats as long as you change [that](https://github.com/GabrielDornelles/EchidNet-OCR/blob/5275b1169051763fbb08f583871a28e88c706454/train.py#L56))
 
 2 - Make sure to normalize your data length (num of chars in image) while training (or just trick it to send same length). You can also use the image_validation.py and specify how big the length can be and just remove data out of expected.
 
@@ -13,6 +13,11 @@ NOTE: Your images must be named like "text_in_your_img.png", model will pick up 
 
 You should have your model saved as the desired name in config file and two png files containing accuracy over epochs and train_loss&test_loss over epochs. Change the config file and do your custom training (there no calculation for the convolutional layers, if you change image size make sure to also change the number of parameters in the linear layer before Gated Recurrent Unit ([here](https://github.com/GabrielDornelles/EchidNet-OCR/blob/11d07be575898eeae8d731fab95183f91a005019/model.py#L43))). Also you can Use LSTM instead of GRU or just create new models.
 
+your model data will look like this (example):
+
+![accuracy_graph](https://user-images.githubusercontent.com/56324869/111052708-1af37880-843c-11eb-9b27-954519e5975e.png)
+
+![losses_graph](https://user-images.githubusercontent.com/56324869/111052721-39597400-843c-11eb-8d22-d26f815d4209.png)
 
 # TODO: 
 If you want to do any of these here's the notebook: [EchidNet Model](https://github.com/GabrielDornelles/EchidNet)
