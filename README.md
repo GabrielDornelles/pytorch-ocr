@@ -9,7 +9,7 @@
 
 3 - After that just run train.py and you should be happy.
 
-NOTE: Your images must be named "text_in_your_img.png".
+NOTE: Your images must be named like "text_in_your_img.png", model will pick up the text on it as the answer and train based on that.
 
 You should have your model saved as the desired name in config file and two png files containing accuracy over epochs and train_loss&test_loss over epochs. Change the config file and do your custom training (there no calculation for the convolutional layers, if you change image size make sure to also change the number of parameters in the linear layer before Gated Recurrent Unit ([here](https://github.com/GabrielDornelles/EchidNet-OCR/blob/11d07be575898eeae8d731fab95183f91a005019/model.py#L43))). Also you can Use LSTM instead of GRU or just create new models.
 
