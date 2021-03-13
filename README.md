@@ -1,4 +1,4 @@
-# EchidNet-OCR
+# TorchNN-OCR
 ## A Torch Optical Character Recognition Neural Net using EchidNet,  and other CNN's with a Recurrent layer on top of it.
 
 
