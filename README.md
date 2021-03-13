@@ -3,7 +3,7 @@
 
 
 ----------------------------------------------------
-1 - Just create a dir called "dataset" and throw your images there (preferable to be png, but you can use other formats as long as you change
+1 - Just create a dir called "dataset" and throw your images there (preferable to be png, but you can use other formats as long as you change [that](https://github.com/GabrielDornelles/EchidNet-OCR/blob/5275b1169051763fbb08f583871a28e88c706454/train.py#L56)
 
 2 - Make sure to normalize your data length (num of chars in image) while training (or just trick it to send same length). You can also use the image_validation.py and specify how big the length can be and just remove data out of expected.
 
@@ -11,7 +11,7 @@
 
 
 # TODO: 
-If you want to do any of these: [EchidNet Model](https://github.com/GabrielDornelles/EchidNet)
+If you want to do any of these here's the notebook: [EchidNet Model](https://github.com/GabrielDornelles/EchidNet)
 - EchidNet for simple documents and text  not implemented yet, instead working with a different CNN for more complicated characters with noise. 
 - Contour finding to use EchidNet at max speed without the Recurrent layer (for simple letters and numbers  that can be detected and splitted)
 - Hyperparameter settings for EchidNet or model variations with stronger feature extraction (but still small).
