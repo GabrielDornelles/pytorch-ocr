@@ -19,6 +19,10 @@ your model data will look like this (example):
 
 ![losses_graph](https://user-images.githubusercontent.com/56324869/111052721-39597400-843c-11eb-8d22-d26f815d4209.png)
 
+demo:
+https://user-images.githubusercontent.com/56324869/111344173-e9a4c380-865a-11eb-99db-4d990fe2dd01.mp4
+
+
 # TODO: 
 If you want to do any of these here's the notebook: [EchidNet Model](https://github.com/GabrielDornelles/EchidNet)
 - EchidNet for simple documents and text  not implemented yet, instead working with a different CNN for more complicated characters with noise. 
