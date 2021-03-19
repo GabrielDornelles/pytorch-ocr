@@ -36,16 +36,17 @@ class OcrModel(nn.Module):
     def __init__(self, num_chars):
         super(OcrModel, self).__init__()
 
-        self.conv_1 = nn.Conv2d(3, 256, kernel_size=(3, 6), padding=(1, 1))
+        self.conv_1 = nn.Conv2d(3, 256, kernel_size=(3, 5), padding=(1, 1)) # change these kernels depending on your input shape ratio, 
+        # here is 75x25, 75/25=3, 3/2= 1.5, should be your kernel ratio, 3*1.5=4.5 > 5, thus 3x5
         self.pool_1 = nn.MaxPool2d(kernel_size=(2, 2))
-        self.conv_2 = nn.Conv2d(256, 64, kernel_size=(3, 6), padding=(1, 1))
+        self.conv_2 = nn.Conv2d(256, 64, kernel_size=(3, 5), padding=(1, 1))
         self.pool_2 = nn.MaxPool2d(kernel_size=(2, 2))
-        self.linear_1 = nn.Linear(384 , 64) #for 70 is 384
-        self.drop_1 = nn.Dropout(0.2)
-        self.lstm = nn.GRU(64, 64, bidirectional=True, num_layers=2, dropout=0.25, batch_first=True) #64 inputs, 32 outputs
-        self.output = nn.Linear(128, num_chars + 1)
-        print(f"num of chars {num_chars}")
 
+        self.linear_1 = nn.Linear(384 , 128) #for 25 is 384, 50 is 768
+        self.drop_1 = nn.Dropout(0.2)
+        self.lstm = nn.GRU(128, 128, bidirectional=True, num_layers=4, dropout=0.25, batch_first=True) #before, 2 layers 64 outputs bidirectional
+        self.output = nn.Linear(256, num_chars + 1)
+        
         #self.network = EfficientNet.from_pretrained('efficientnet-b0', num_classes=34)
         # #elf.features = model.extract_features(img)
         # #self.network._fc = nn.Linear(self.network._fc.in_features, 64)
