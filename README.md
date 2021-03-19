@@ -29,3 +29,6 @@ If you want to do any of these here's the notebook: [EchidNet Model](https://git
 - Contour finding to use EchidNet at max speed without the Recurrent layer (for simple letters and numbers  that can be detected and splitted)
 - Hyperparameter settings for EchidNet or model variations with stronger feature extraction (but still small).
 - Larger training for both simple and noisy characters.
+
+# UPDATES:
+- No longer need to use or remove duplicated characters, the new model on ocrmodel can achieve pretty much same accuracy compared to the model that removes (model that removes was reaching something like 87%, new model 83%, but remember, deleting duplicates is highly not recommended, so use the new model).
