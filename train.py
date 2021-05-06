@@ -125,7 +125,8 @@ def run_training():
         combined = list(zip(test_targets_orig, valid_captcha_preds))
         if config.VIEW_INFERENCE_WHILE_TRAINING:
             print(f"validations: {combined}") # combined[:10] print right answer vs predicted answer, first 10 from batch
-        test_dup_rem = [remove_duplicates(c) for c in test_targets_orig]
+        #test_dup_rem = [remove_duplicates(c) for c in test_targets_orig]
+        test_dup_rem = test_targets_orig
         accuracy = metrics.accuracy_score(test_dup_rem, valid_captcha_preds)
         print(
             f"Epoch={epoch}, Train Loss={train_loss}, Test Loss={test_loss} Accuracy={accuracy}"
