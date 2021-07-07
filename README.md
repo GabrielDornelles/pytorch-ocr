@@ -1,5 +1,9 @@
 # TorchNN-OCR
-## A Torch Optical Character Recognition Neural Net using EchidNet,  and other CNN's with a Recurrent layer on top of it.
+
+![ezgif com-gif-maker (6)](https://user-images.githubusercontent.com/56324869/124807313-02035b80-df34-11eb-824a-a9e2d94fb7fb.gif)
+
+
+## A PyTorch OCR using a Convolutional Recurrent Neural Network.
 
 
 ----------------------------------------------------
