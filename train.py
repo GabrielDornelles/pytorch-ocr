@@ -1,11 +1,13 @@
 import os
 import glob
 from datetime import datetime
+from collections import Counter
 
 import torch
-from torch import nn
 import numpy as np
+from torch import nn
 import copy
+
 from sklearn import preprocessing
 from sklearn import model_selection
 from sklearn import metrics
@@ -16,7 +18,12 @@ import engine
 from model import OcrModel
 from plot import plot_acc, plot_losses
 
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
 torch.cuda.empty_cache()
+
 
 def remove_duplicates(x):
     if len(x) < 2:
@@ -31,6 +38,27 @@ def remove_duplicates(x):
             else:
                 fin = fin + j
     return fin
+
+def ctc_duplicates(x):
+    """
+    Custom designed CTC workaround 
+    """
+    conversion = {
+    4:2,
+    3:1,
+    2:1,
+    1:1
+    }
+    c = Counter(str(x))
+    true_answer = ""
+    for current_digit, current_digit_appears in c.items():
+        if current_digit_appears > 4:
+            repeat = 1
+        else:
+            repeat = conversion[current_digit_appears]
+        true_answer += current_digit * repeat
+    return true_answer
+
 
 def decode_predictions(preds, encoder):
     preds = preds.permute(1, 0, 2)
@@ -48,7 +76,7 @@ def decode_predictions(preds, encoder):
                 p = encoder.inverse_transform([k])[0]
                 temp.append(p)
         tp = "".join(temp).replace("§", "")
-        cap_preds.append(remove_duplicates(tp))
+        cap_preds.append((ctc_duplicates(tp)))
     return cap_preds
 
 
@@ -124,15 +152,33 @@ def run_training():
 
         combined = list(zip(test_targets_orig, valid_captcha_preds))
         if config.VIEW_INFERENCE_WHILE_TRAINING:
-            print(f"validations: {combined}") # combined[:10] print right answer vs predicted answer, first 10 from batch
-        #test_dup_rem = [remove_duplicates(c) for c in test_targets_orig]
+            table = Table(show_header=True, header_style="hot_pink")
+            table.add_column("Ground Truth", width=12)
+            table.add_column("Predicted")
+            table.border_style = "bright_yellow"
+            table.columns[0].style = "violet"
+            table.columns[1].style = "grey93"
+            for idx in combined:
+                table.add_row(idx[0]
+                ,idx[1])
+            console.print(table)
+           
         test_dup_rem = test_targets_orig
         accuracy = metrics.accuracy_score(test_dup_rem, valid_captcha_preds)
-        print(
-            f"Epoch={epoch}, Train Loss={train_loss}, Test Loss={test_loss} Accuracy={accuracy}"
-        )
+    
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Epoch", style="aquamarine1", width=12)
+        table.add_column("Train Loss", style="bright_green")
+        table.add_column("Test Loss", style="bright_green")
+        table.add_column("Accuracy", style="bright_yellow")
+        table.add_column("Best Accuracy", style="gold1")
+        table.columns[0].header_style = "aquamarine1"
+        table.columns[1].header_style = "bright_green"
+        table.columns[2].header_style = "bright_green"
+        table.columns[3].header_style = "bright_yellow"
+        table.columns[4].header_style = "bright_yellow"
+        
         accuracy_data.append(accuracy)
-
         if accuracy > best_acc:
             best_acc = accuracy
             best_model_wts = copy.deepcopy(model.state_dict())
@@ -140,7 +186,13 @@ def run_training():
                 torch.save(model, f"checkpoint-{(best_acc*100):.2f}.pth")
 
         scheduler.step(test_loss)
-        print(f"best accuracy: {(best_acc*100):.2f}%")
+        table.add_row(str(epoch),
+        str(train_loss),
+        str(test_loss),
+        str(accuracy), 
+        str(best_acc))
+        console.print(table)
+
     print(f"final best accuracy: {(best_acc*100):.2f}%")
 
     model.load_state_dict(best_model_wts)
@@ -152,4 +204,7 @@ def run_training():
    
 
 if __name__ == "__main__":
-    run_training()
+    try:
+        run_training()
+    except Exception:
+        console.print_exception()
