@@ -7,6 +7,8 @@ import config
 class OcrModel(nn.Module):
     def __init__(self, num_chars):
         super().__init__()
+        # IMAGE_WIDTH = int(245/2) 
+        # IMAGE_HEIGHT = int(125/2)
         self.conv_1 = nn.Conv2d(3, 256, kernel_size=(3, 5), padding=(1, 1))
         self.pool_1 = nn.MaxPool2d(kernel_size=(2, 2))
         self.conv_2 = nn.Conv2d(256, 64, kernel_size=(3, 5), padding=(1, 1))

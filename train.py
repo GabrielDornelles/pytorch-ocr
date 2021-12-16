@@ -24,61 +24,36 @@ from rich.table import Table
 console = Console()
 torch.cuda.empty_cache()
 
+classes = ['∅', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
-def remove_duplicates(x):
-    if len(x) < 2:
-        return x
-    fin = ""
-    for j in x:
-        if fin == "":
-            fin = j
-        else:
-            if j == fin[-1]:
-                continue
-            else:
-                fin = fin + j
-    return fin
-
-def ctc_duplicates(x):
+def decode_predictions(predictions):
     """
-    Custom designed CTC workaround 
+    CTC RNN Layer decoder.
+    1.
+        2 (or more) repeating digits are collapsed into a single instance of that digit unless 
+        separated by blank - this compensates for the fact that the RNN performs a classification 
+        for each stripe that represents a part of a digit (thus producing duplicates)
+    2.
+        Multiple consecutive blanks are collapsed into one blank - this compensates 
+        for the spacing before, after or between the digits
     """
-    conversion = {
-    4:2,
-    3:1,
-    2:1,
-    1:1
-    }
-    c = Counter(str(x))
-    true_answer = ""
-    for current_digit, current_digit_appears in c.items():
-        if current_digit_appears > 4:
-            repeat = 1
-        else:
-            repeat = conversion[current_digit_appears]
-        true_answer += current_digit * repeat
-    return true_answer
+    predictions = predictions.permute(1, 0, 2)
+    predictions = torch.softmax(predictions, 2)
+    predictions = torch.argmax(predictions, 2)
+    predictions = predictions.detach().cpu().numpy()
+    texts = []
+    for i in range(predictions.shape[0]):
+        string = ""
+        batch_e = predictions[i]
+        
+        for j in range(len(batch_e)):
+            string += classes[batch_e[j]]
 
-
-def decode_predictions(preds, encoder):
-    preds = preds.permute(1, 0, 2)
-    preds = torch.softmax(preds, 2)
-    preds = torch.argmax(preds, 2)
-    preds = preds.detach().cpu().numpy()
-    cap_preds = []
-    for j in range(preds.shape[0]):
-        temp = []
-        for k in preds[j, :]:
-            k = k - 1
-            if k == -1:
-                temp.append("§")
-            else:
-                p = encoder.inverse_transform([k])[0]
-                temp.append(p)
-        tp = "".join(temp).replace("§", "")
-        cap_preds.append((ctc_duplicates(tp)))
-    return cap_preds
-
+        string = string.split("∅")
+        string = [x for x in string if x != ""]
+        string = [list(set(x))[0] for x in string]
+        texts.append(''.join(string))
+    return texts
 
 def run_training():
     image_files = glob.glob(os.path.join(config.DATA_DIR, "*.png"))
@@ -126,6 +101,7 @@ def run_training():
     )
 
     print(f"num of classes: {len(lbl_enc.classes_)}")
+    print(f"classes: {lbl_enc.classes_}")
     model = OcrModel(num_chars=len(lbl_enc.classes_))
     model.to(config.DEVICE)
 
@@ -147,7 +123,7 @@ def run_training():
         valid_loss_data.append(test_loss)
         valid_captcha_preds = []
         for vp in valid_preds:
-            current_preds = decode_predictions(vp, lbl_enc)
+            current_preds = decode_predictions(vp)
             valid_captcha_preds.extend(current_preds)
 
         combined = list(zip(test_targets_orig, valid_captcha_preds))
@@ -158,7 +134,7 @@ def run_training():
             table.border_style = "bright_yellow"
             table.columns[0].style = "violet"
             table.columns[1].style = "grey93"
-            for idx in combined:
+            for idx in combined[:]:
                 table.add_row(idx[0]
                 ,idx[1])
             console.print(table)
