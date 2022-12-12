@@ -15,6 +15,6 @@ bools:
   SAVE_CHECKPOINTS: true
 
 paths:
-  dataset_dir: ./cnpj_captchas
+  dataset_dir: ./dataset
   save_model_as: ./logs/crnn_best.pth
   

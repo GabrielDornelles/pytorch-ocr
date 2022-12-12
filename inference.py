@@ -43,6 +43,6 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load("./logs/crnn_best.pth"))
     model.eval()
 
-    filepath = "/home/gabriel/Documents/Gabriel/TorchNN-OCR/cnpj_captchas/1sk9jj.png"
+    filepath = "sample.png"
     answer = inference(filepath)
     print(f"text: {answer}")
