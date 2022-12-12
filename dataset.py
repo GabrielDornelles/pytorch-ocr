@@ -1,12 +1,12 @@
 import albumentations
 import torch
-
 import numpy as np
 
 from PIL import Image
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 
 class ClassificationDataset:
     def __init__(self, image_paths, targets, resize=None):

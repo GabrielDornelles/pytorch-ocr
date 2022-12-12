@@ -2,4 +2,5 @@ __pycache__/
 dataset/
 *.pth
 *.png
-93.4model
+logs/
+outputs/

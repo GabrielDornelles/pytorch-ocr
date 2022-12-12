@@ -1,0 +1,20 @@
+processing:
+  device: cuda
+  image_width: 180
+  image_height: 50
+  
+training:
+  lr: 3e-4
+  batch_size: 8
+  num_workers: 4
+  num_epochs: 100
+
+bools:
+  DISPLAY_ONLY_WRONG_PREDICTIONS: true
+  VIEW_INFERENCE_WHILE_TRAINING: true
+  SAVE_CHECKPOINTS: true
+
+paths:
+  dataset_dir: ./cnpj_captchas
+  save_model_as: ./logs/crnn_best.pth
+  

@@ -1,16 +1,13 @@
-from tqdm import tqdm
 import torch
-import config
-import time
 from rich.progress import track
 
-def train_fn(model, data_loader, optimizer):
+def train_fn(model, data_loader, optimizer, device):
     model.train()
     fin_loss = 0
 
     for data in track(data_loader, description="😪 Training..."):
         for key, value in data.items():
-            data[key] = value.to(config.DEVICE)
+            data[key] = value.to(device)
 
         optimizer.zero_grad()
         _, loss = model(**data)
@@ -19,14 +16,14 @@ def train_fn(model, data_loader, optimizer):
         fin_loss += loss.item()
     return fin_loss / len(data_loader)
 
-def eval_fn(model, data_loader):
+def eval_fn(model, data_loader, device):
     model.eval()
-    with torch.no_grad(): # model forward steps is requires_grad=True by default, inference will never need to calculate gradients so disable it and save memory
+    with torch.no_grad():
         fin_loss = 0
         fin_preds = []
         for data in track(data_loader,description="🤔 Testing ..."):
             for key, value in data.items():
-                data[key] = value.to(config.DEVICE)
+                data[key] = value.to(device)
 
             batch_preds, loss = model(**data)
             fin_loss += loss.item()
