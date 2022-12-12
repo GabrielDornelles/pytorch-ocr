@@ -15,6 +15,7 @@ from sklearn import metrics
 from rich.console import Console
 from rich.table import Table
 from rich import print
+import logging
 
 import dataset
 import engine
@@ -27,11 +28,22 @@ from utils.ctc_decoder import decode_predictions
 # Setup rich console
 console = Console()
 
+def setup_logging():
+    # This function overwrites 'datefmt' from hydra default logger
+    # TODO: is there anyway to set datefmt direclty at configs/hydra/job_logging/custom.yaml?
+    logger = logging.getLogger()
+    formatter = logging.Formatter(fmt='[%(levelname)s][%(asctime)s]: %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+    for handler in logger.handlers:
+        handler.setFormatter(formatter)
+    return logger
+
 @hydra.main(config_path="./configs", config_name="config", version_base=None)
 def run_training(cfg):
+    # Setup logging
+    logger = setup_logging()
     
-    print("Configurations:")
-    print(OmegaConf.to_yaml(cfg))
+    logger.info(f"Configurations:\n{OmegaConf.to_yaml(cfg)}")
+    print(f"Configurations:\n{OmegaConf.to_yaml(cfg)}")
 
     # 1. Dataset and dataloaders
     image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.png"))
@@ -76,6 +88,8 @@ def run_training(cfg):
 
     print(f"Dataset number of classes: {len(lbl_enc.classes_)}")
     print(f"Classes are: {lbl_enc.classes_}")
+    logging.info(f"Dataset number of classes: {len(lbl_enc.classes_)}")
+    logging.info(f"Classes are: {lbl_enc.classes_}")
     
     # 2. Setup model, optim and scheduler
     device = cfg.processing.device
@@ -149,6 +163,7 @@ def run_training(cfg):
         accuracy_data.append(accuracy)
         if accuracy > best_acc:
             best_acc = accuracy
+            logger.info(f"New best accuracy achieved at epoch {epoch}. Best accuracy now is: {best_acc}")
             best_model_wts = copy.deepcopy(model.state_dict())
             if cfg.bools.SAVE_CHECKPOINTS:
                 torch.save(model, f"logs/checkpoint-{(best_acc*100):.2f}.pth")
@@ -160,14 +175,15 @@ def run_training(cfg):
         str(accuracy), 
         str(best_acc))
         console.print(table)
+        logger.info(f"Epoch {epoch}:    Train loss: {train_loss}    Test loss: {test_loss}    Accuracy: {accuracy}")
 
     # 4. Save model + logging and plotting
-    print(f"Best Accuracy was: {(best_acc*100):.2f}%")
+    logger.info(f"Finished training.\nBest Accuracy was: {(best_acc*100):.2f}%")
 
     model.load_state_dict(best_model_wts)
     torch.save(model.state_dict(), cfg.paths.save_model_as)
 
-    print(f"Saving model on {cfg.paths.save_model_as}\nTraining time: {datetime.now()-start}")
+    logger.info(f"Saving model on {cfg.paths.save_model_as}\nTraining time: {datetime.now()-start}")
     
     plot_losses(train_loss_data, valid_loss_data)
     plot_acc(accuracy_data)

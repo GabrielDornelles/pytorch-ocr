@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/job_logging: custom
+  
 processing:
   device: cuda
   image_width: 180
@@ -12,9 +15,9 @@ training:
 bools:
   DISPLAY_ONLY_WRONG_PREDICTIONS: true
   VIEW_INFERENCE_WHILE_TRAINING: true
-  SAVE_CHECKPOINTS: true
+  SAVE_CHECKPOINTS: false
 
 paths:
-  dataset_dir: ./dataset
+  dataset_dir: ./cnpj_captchas
   save_model_as: ./logs/crnn_best.pth
   
