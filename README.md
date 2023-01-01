@@ -48,10 +48,11 @@ python3 train.py
 ## Currently Support:
 
 - CRNNs
+- Attention (but projected back to linear layer)
 - CTC Loss
 
 ## Will Support:
-- Attention at predictions (so you can choose either CTC or Attention)
+- Attention with CrossEntropyLoss
 - Other backbones
 
 

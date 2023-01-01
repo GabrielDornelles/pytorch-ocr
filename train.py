@@ -21,6 +21,7 @@ import dataset
 import engine
 
 from models.resnet_gru import ResNetGRU
+from models.attention_crnn import ResNetGruAttention 
 from utils.plot import plot_acc, plot_losses
 from utils.ctc_decoder import decode_predictions
 
@@ -91,13 +92,15 @@ def run_training(cfg):
     logging.info(f"Dataset number of classes: {len(lbl_enc.classes_)}")
     logging.info(f"Classes are: {lbl_enc.classes_}")
     
+
     # 2. Setup model, optim and scheduler
     device = cfg.processing.device
-    model = ResNetGRU(num_chars=len(lbl_enc.classes_))
-    
+    #model = ResNetGRU(num_chars=len(lbl_enc.classes_))
+    model = ResNetGruAttention(dims=256, num_chars=len(lbl_enc.classes_))
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.lr)
+    #optimizer = torch.optim.Adadelta(model.parameters(), lr=cfg.training.lr, rho=0.85, eps=1e-8)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, factor=0.8, patience=5, verbose=True
     )
@@ -178,7 +181,7 @@ def run_training(cfg):
         logger.info(f"Epoch {epoch}:    Train loss: {train_loss}    Test loss: {test_loss}    Accuracy: {accuracy}")
 
     # 4. Save model + logging and plotting
-    logger.info(f"Finished training.\nBest Accuracy was: {(best_acc*100):.2f}%")
+    logger.info(f"Finished training. Best Accuracy was: {(best_acc*100):.2f}%")
 
     model.load_state_dict(best_model_wts)
     torch.save(model.state_dict(), cfg.paths.save_model_as)
