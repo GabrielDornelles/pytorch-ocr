@@ -10,7 +10,7 @@ training:
   lr: 3e-4
   batch_size: 8
   num_workers: 4
-  num_epochs: 100
+  num_epochs: 200
 
 bools:
   DISPLAY_ONLY_WRONG_PREDICTIONS: true
@@ -19,5 +19,5 @@ bools:
 
 paths:
   dataset_dir: ./dataset
-  save_model_as: ./logs/crnn_best.pth
+  save_model_as: ./logs/crnn.pth
   

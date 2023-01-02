@@ -3,8 +3,8 @@ import albumentations
 import numpy as np
 from PIL import Image 
 
-from models.resnet_gru import ResNetGRU
-from utils.ctc_decoder import decode_predictions
+from models.crnn import CRNN
+from utils.model_decoders import decode_predictions, decode_padded_predictions
 
 
 # I use "∅" to denote the blank token. This list is automatically generated at training, 
@@ -32,15 +32,23 @@ def inference(image_path):
     image = image.float()
     with torch.no_grad():
         preds, _ = model(image)
-    answer = decode_predictions(preds, classes)
+    
+    if model.use_ctc:
+        answer = decode_predictions(preds, classes)
+    else:
+        answer = decode_padded_predictions(preds, classes)
     return answer
 
 if __name__ == "__main__":
     # Setup model and load weights
-    model = ResNetGRU(35)
+    model = CRNN(dims=256,
+        num_chars=35, 
+        use_attention=True,
+        use_ctc=True
+    )
     device = torch.device("cuda")
     model.to(device)
-    model.load_state_dict(torch.load("./logs/crnn_best.pth"))
+    model.load_state_dict(torch.load("./logs/crnn.pth"))
     model.eval()
 
     filepath = "sample.png"

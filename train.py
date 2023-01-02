@@ -20,10 +20,9 @@ import logging
 import dataset
 import engine
 
-from models.resnet_gru import ResNetGRU
-from models.attention_crnn import ResNetGruAttention 
+from models.crnn import CRNN 
 from utils.plot import plot_acc, plot_losses
-from utils.ctc_decoder import decode_predictions
+from utils.model_decoders import decode_predictions, decode_padded_predictions
 
 
 # Setup rich console
@@ -48,21 +47,21 @@ def run_training(cfg):
 
     # 1. Dataset and dataloaders
     image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.png"))
-    targets_orig = [x.split("/")[-1][:-4].replace("-copy", "") for x in image_files]
-    targets = [[c for c in x] for x in targets_orig]
+    original_targets = [x.split("/")[-1][:-4].replace("-copy", "") for x in image_files]
+    targets = [[c for c in x] for x in original_targets]
     targets_flat = [c for clist in targets for c in clist]
-    lbl_enc = preprocessing.LabelEncoder()
-    lbl_enc.fit(targets_flat)
-    targets_enc = [lbl_enc.transform(x) for x in targets]
-    targets_enc = np.array(targets_enc)
-    targets_enc = targets_enc + 1
-
+    label_encoder = preprocessing.LabelEncoder()
+    label_encoder.fit(targets_flat)
+    targets_encoded = [label_encoder.transform(x) for x in targets]
+    targets_encoded = np.array(targets_encoded)
+    targets_encoded = targets_encoded + 1
+    
     (train_imgs, 
     test_imgs, 
     train_targets, 
     test_targets, 
     _, 
-    test_targets_orig) = model_selection.train_test_split(image_files, targets_enc, targets_orig, test_size=0.1, random_state=42)
+    test_original_targets) = model_selection.train_test_split(image_files, targets_encoded, original_targets, test_size=0.1, random_state=42)
 
     train_dataset = dataset.ClassificationDataset(
         image_paths=train_imgs,
@@ -87,20 +86,21 @@ def run_training(cfg):
         shuffle=False,
     )
 
-    print(f"Dataset number of classes: {len(lbl_enc.classes_)}")
-    print(f"Classes are: {lbl_enc.classes_}")
-    logging.info(f"Dataset number of classes: {len(lbl_enc.classes_)}")
-    logging.info(f"Classes are: {lbl_enc.classes_}")
+    print(f"Dataset number of classes: {len(label_encoder.classes_)}")
+    print(f"Classes are: {label_encoder.classes_}")
+    logging.info(f"Dataset number of classes: {len(label_encoder.classes_)}")
+    logging.info(f"Classes are: {label_encoder.classes_}")
     
-
     # 2. Setup model, optim and scheduler
     device = cfg.processing.device
-    #model = ResNetGRU(num_chars=len(lbl_enc.classes_))
-    model = ResNetGruAttention(dims=256, num_chars=len(lbl_enc.classes_))
+    model = CRNN(dims=256, 
+        num_chars=len(label_encoder.classes_), 
+        use_attention=False, 
+        use_ctc=True)
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.lr)
-    #optimizer = torch.optim.Adadelta(model.parameters(), lr=cfg.training.lr, rho=0.85, eps=1e-8)
+    #optimizer = torch.optim.Adadelta(model.parameters(), lr=1, rho=0.85, eps=1e-8)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, factor=0.8, patience=5, verbose=True
     )
@@ -110,9 +110,9 @@ def run_training(cfg):
     valid_loss_data = []
     accuracy_data = []
    
-    # This is the same list as training, but with the '∅' token, that denotes blank
+    # This is the same list as training, but with the '∅' token, that denotes blank for ctc, or pad for cross_entropy
     classes = ['∅']
-    classes.extend(lbl_enc.classes_)
+    classes.extend(label_encoder.classes_)
 
     # 3. Training and logging
     if not os.path.exists('logs'): os.makedirs('logs')
@@ -126,12 +126,16 @@ def run_training(cfg):
         valid_loss_data.append(test_loss)
         # Eval + decoding for logging purposes
         valid_captcha_preds = []
+        
         for vp in valid_preds:
-            current_preds = decode_predictions(vp, classes)
+            if model.use_ctc:
+                current_preds = decode_predictions(vp, classes)
+            else:
+                current_preds = decode_padded_predictions(vp, classes)
             valid_captcha_preds.extend(current_preds)
 
         # Logging
-        combined = list(zip(test_targets_orig, valid_captcha_preds))
+        combined = list(zip(test_original_targets, valid_captcha_preds))
         if cfg.bools.VIEW_INFERENCE_WHILE_TRAINING:
             table = Table(show_header=True, header_style="hot_pink")
             table.add_column("Ground Truth", width=12)
@@ -148,8 +152,9 @@ def run_training(cfg):
                     table.add_row(idx[0]
                     ,idx[1])
             console.print(table)
-           
-        accuracy = metrics.accuracy_score(test_targets_orig, valid_captcha_preds)
+        
+        #print(valid_captcha_preds)
+        accuracy = metrics.accuracy_score(test_original_targets, valid_captcha_preds)
     
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("Epoch", style="aquamarine1", width=12)
