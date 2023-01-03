@@ -1,7 +1,7 @@
 # Changelog 
 
 ## [1.0.3] - 03/01/2023
-### Hightlight
+### Highlight
 
 - Training a model with attention and cross entropy loss is now finally possible.
 

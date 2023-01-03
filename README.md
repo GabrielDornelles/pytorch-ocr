@@ -39,20 +39,21 @@ You have the whole **Training Log** in a train.log file so you can process it an
     ```
     The image name needs to be the content writen in the image. In this case you have one image with 'cute' written in it, other with 'motor' and another with 'machine'.
 
-- Your data should be of same length, padding is done automatically if using Attention + CrossEntropy, but padding is not done for CTC Loss, so make sure you normalize your target lengths in case of using CTC Loss.
+- Your data should be of same length, padding is done automatically if using Attention + CrossEntropy, but padding is not done for CTC Loss, so make sure you normalize your target lengths in case of using CTC Loss (you can do this by adding a character to represent empty space, remember to not use the same as CTC uses for blank, those are different blanks).
 
 - Run:
 ```sh
 python3 train.py
 ```
-## Currently Support:
+## Support:
 
 - CRNNs ✅
-- Attention + CTC Loss✅ 
+- Attention + CTC Loss ✅ 
 - Attention + Cross Entropy Loss ✅
 
 ## Will Support:
 - Other backbones
+- Self Attention instead of old RNNs?
 
 # TODO:
 - ~~Add logging with hydra, so it saves logging in text files~~. ✅
