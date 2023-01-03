@@ -31,6 +31,7 @@ def train_fn(model: nn.Module, data_loader: DataLoader, optimizer: Optimizer, de
         optimizer.zero_grad()
         _, loss = model(**data)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 5)
         optimizer.step()
         fin_loss += loss.item()
     return fin_loss / len(data_loader)

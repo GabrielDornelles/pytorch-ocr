@@ -1,11 +1,27 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
+
+class SelfAttention(nn.Module):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.q = nn.Linear(in_features=256, out_features=256)
+        self.k = nn.Linear(in_features=256, out_features=256)
+        self.v = nn.Linear(in_features=256, out_features=256)
+    
+    def forward(self, x):
+        Q = self.q(x)
+        K = self.k(x)
+        V = self.v(x)
+
+        z = F.softmax(torch.bmm(Q, K.transpose(1,2)))
 
 class Attention(nn.Module):
     """
     https://pytorchnlp.readthedocs.io/en/latest/_modules/torchnlp/nn/attention.html
 
-    Likewise implementation of general attention from torch.nlp
+    Likewise implementation of general attention from torch.nlp. Apparently this is called Bahdanau attention.
     """
     def __init__(self, dims):
         super().__init__()

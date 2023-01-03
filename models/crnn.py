@@ -67,11 +67,13 @@ class CRNN(nn.Module):
         4. Project Attention layer (or GRU directly) to linear with classes prob distribuition.
         """
         features = self.encode(images)
-        x, _ = self.lstm(features) # [1,45,256]: batch_size, sequence_length, hidden_dim
+        hiddens, _ = self.lstm(features) # [1,45,256]: batch_size, sequence_length, hidden_dim
 
         if self.use_attention:
-            x, _ = self.attention(x, features) # torch.size([1,45,256]), 45 is the sequence length
-        x = self.projection(x) 
+            attention , _ = self.attention(hiddens, features) # torch.size([1,45,256]), 45 is the sequence length
+            x = hiddens * attention
+
+        x = self.projection(x) if self.use_attention else self.projection(hiddens)
         
         if self.use_ctc and targets is not None:
             x = x.permute(1, 0, 2)
@@ -84,8 +86,8 @@ class CRNN(nn.Module):
       
         return x, None
     
-    @staticmethod
-    def pad_targets(targets: Tensor, sequence_length: int, num_classes: int) -> Tensor:
+    
+    def pad_targets(self, targets: Tensor, sequence_length: int, one_hot: bool = False) -> Tensor:
         """
         Pad the targets and convert them to one-hot encoding.
 
@@ -105,13 +107,18 @@ class CRNN(nn.Module):
         """
         padding = (0, sequence_length - targets.shape[1])
         padded_targets = F.pad(targets, padding, 'constant', 0)
-        one_hot = F.one_hot(padded_targets, num_classes)
-        return one_hot.to(torch.float)
+        
+        if one_hot:
+            one_hot = F.one_hot(padded_targets, self.num_classes)
+            return one_hot.to(torch.float)
+        return padded_targets
     
     def nll_loss(self, x, targets):
-        targets = self.pad_targets(targets, sequence_length=45, num_classes=self.num_classes)
-        log_probs = F.log_softmax(x, 2)
-        loss = self.cross_entropy(log_probs, targets)
+        targets = self.pad_targets(targets, sequence_length=45, one_hot=False)
+        scalar = 20
+        loss = self.cross_entropy(x.view(-1, x.shape[-1]), targets.contiguous().view(-1)) * scalar
+        # I just scaled the loss by a scalar (20) because it starts too low, which difficults optimization.
+        # It quickly learn that most of the text is padded, thus making a lot of 'correct' predicitons
         return loss
     
     @staticmethod
@@ -127,6 +134,7 @@ class CRNN(nn.Module):
         target_lengths = torch.full( 
             size=(batch_size,), fill_value=targets.size(1), dtype=torch.int32
         )
+      
         loss = nn.CTCLoss(blank=0)(
             log_probs, targets, input_lengths, target_lengths
         )

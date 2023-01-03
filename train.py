@@ -95,8 +95,8 @@ def run_training(cfg):
     device = cfg.processing.device
     model = CRNN(dims=256, 
         num_chars=len(label_encoder.classes_), 
-        use_attention=False, 
-        use_ctc=True)
+        use_attention=True, 
+        use_ctc=False)
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.lr)
