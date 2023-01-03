@@ -8,17 +8,23 @@ You can train models to read **captchas**, **license plates**, **digital display
 
 See:
 
-![image](https://user-images.githubusercontent.com/56324869/206953640-087d17b1-a0a7-4f99-ad82-d8c93365bd41.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56324869/206953640-087d17b1-a0a7-4f99-ad82-d8c93365bd41.png" />
+</p>
 
 
 # Rich Text while Training!
 
-![image](https://user-images.githubusercontent.com/56324869/206952565-1da49dc0-d3ee-4328-8855-19f62aafb435.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56324869/206952565-1da49dc0-d3ee-4328-8855-19f62aafb435.png" />
+</p>
 
 # Hydra Logs!
 You have the whole **Training Log** in a train.log file so you can process it anywhere!
 
-![image](https://user-images.githubusercontent.com/56324869/207184241-855019e3-889d-4c2d-ae11-62dd73f62352.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56324869/207184241-855019e3-889d-4c2d-ae11-62dd73f62352.png"/>
+</p>
 
 
 # How to train?

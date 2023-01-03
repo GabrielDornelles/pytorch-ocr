@@ -9,7 +9,10 @@
 Trained with Cross Entropy Loss and Attention:
 </p>
 
-![accuracy](https://user-images.githubusercontent.com/56324869/210393213-99d35d57-4c85-41a5-b98f-df08c76955fe.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56324869/210393213-99d35d57-4c85-41a5-b98f-df08c76955fe.png" />
+</p>
+
 
 ### Bugfixes
 - Attention layer is now properly applied to the hidden states of GRU Unit. Before, attention was directly projected to linear layer, now Gated Recurrent Unit hidden states are multiplied by the attention weights and then projected to linear layer.
