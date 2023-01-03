@@ -19,11 +19,6 @@ Trained with Cross Entropy Loss and Attention:
 ### Added
 - Added gradient clipping in the training procedure (torch.nn.utils.clip_grad_norm_) with default of 5. It's not parameterizable as I didn't see the necessity of it, but it's at ```engine.py.train_fn``` right after ```loss.backward()```
 
-## [1.0.1] - 01/01/2023
-
-### Added
-- Added Attention mechanism at prediction stage of CRNN (available at models/attention_crnn.py)
-
 ## [1.0.2] - 02/01/2023
 
 ### Changed
@@ -47,6 +42,13 @@ Trained with Cross Entropy Loss and Attention:
 
 ### Removed
 - Removed the old models as attention and loss functions are now parameterizable.
+
+
+## [1.0.1] - 01/01/2023
+
+### Added
+- Added Attention mechanism at prediction stage of CRNN (available at models/attention_crnn.py)
+
 
 ## [1.0.0] - 12/12/2022
 
