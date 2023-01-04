@@ -2,20 +2,35 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+
 class SelfAttention(nn.Module):
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.q = nn.Linear(in_features=256, out_features=256)
-        self.k = nn.Linear(in_features=256, out_features=256)
-        self.v = nn.Linear(in_features=256, out_features=256)
-    
+    def __init__(self, input_dim, hidden_dim):
+        super(SelfAttention, self).__init__()
+        
+        self.query = nn.Linear(input_dim, hidden_dim)
+        self.key = nn.Linear(input_dim, hidden_dim)
+        self.value = nn.Linear(input_dim, hidden_dim)
+        
     def forward(self, x):
-        Q = self.q(x)
-        K = self.k(x)
-        V = self.v(x)
-
-        z = F.softmax(torch.bmm(Q, K.transpose(1,2)))
+        # Calculate the query, key, and value
+        query = self.query(x)
+        key = self.key(x)
+        value = self.value(x)
+        
+        # Calculate the dot product between the query and key
+        dot_product = torch.matmul(query, key.transpose(-2, -1))
+        
+        # Scale the dot product
+        scale = 1.0 / (query.size(-1) ** 0.5)
+        dot_product = scale * dot_product
+        
+        # Apply the softmax function
+        attention_weights = F.softmax(dot_product, dim=-1)
+        
+        # Calculate the weighted sum of the value
+        weighted_sum = torch.matmul(attention_weights, value)
+        
+        return weighted_sum, attention_weights
 
 class Attention(nn.Module):
     """
@@ -46,7 +61,7 @@ class Attention(nn.Module):
             * `weights` (:class:`torch.FloatTensor` [batch size, output length, query length]):
               Tensor containing attention weights.
         """
-        # query=Q, context=K
+        
         batch_size, output_len, dims = query.size()
         query_len = context.size(1)
 
