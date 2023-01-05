@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torchvision.models import resnet18, ResNet18_Weights
-from models.attention import Attention
+from models.attention import Attention, SelfAttention
 from torch import Tensor
 
 class CRNN(nn.Module):
@@ -33,7 +33,7 @@ class CRNN(nn.Module):
 
         # sequence modeling
         self.lstm = nn.GRU(dims, dims//2, bidirectional=True, num_layers=1, batch_first=True) 
-        
+        self.self_attn = SelfAttention(dims, dims)
         # output
         if use_attention:
             self.attention = Attention(dims=dims)
@@ -68,7 +68,7 @@ class CRNN(nn.Module):
         """
         features = self.encode(images)
         hiddens, _ = self.lstm(features) # [1,45,256]: batch_size, sequence_length, hidden_dim
-
+        #hiddens, _ = self.self_attn(features)
         if self.use_attention:
             attention , _ = self.attention(hiddens, features) # torch.size([1,45,256]), 45 is the sequence length
             x = hiddens * attention

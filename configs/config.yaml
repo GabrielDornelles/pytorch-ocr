@@ -20,4 +20,10 @@ bools:
 paths:
   dataset_dir: ./dataset
   save_model_as: ./logs/crnn.pth
+
+model:
+  use_attention: true 
+  use_ctc: true
+  dims: 256
+
   

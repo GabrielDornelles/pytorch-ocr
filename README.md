@@ -47,6 +47,13 @@ You have the whole **Training Log** in a train.log file so you can process it an
 
 - Your data should be of same length, padding is done automatically if using Attention + CrossEntropy, but padding is not done for CTC Loss, so make sure you normalize your target lengths in case of using CTC Loss (you can do this by adding a character to represent empty space, remember to not use the same as CTC uses for blank, those are different blanks).
 
+- Configure your model at ```configs/config.yaml```
+  ```yaml
+  model:
+    use_attention: true 
+    use_ctc: true
+    dims: 256
+  ```
 - Run:
 ```sh
 python3 train.py
@@ -65,3 +72,4 @@ python3 train.py
 - ~~Add logging with hydra, so it saves logging in text files~~. ✅
 - Add CI with github actions, to test if everything works fine after pushes to this repo.
 - Add tests to main methods so it keeps secure when adding more models and functionalities in the future.
+- Configure Dockerfile to work with nvidia gpu for training.
