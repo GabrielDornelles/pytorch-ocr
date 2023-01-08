@@ -46,7 +46,7 @@ def run_training(cfg):
     print(f"Configurations:\n{OmegaConf.to_yaml(cfg)}")
 
     # 1. Dataset and dataloaders
-    image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.jpg"))
+    image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.png"))
     original_targets = [x.split("/")[-1][:-4].replace("-copy", "") for x in image_files]
     targets = [[c for c in x] for x in original_targets]
     targets_flat = [c for clist in targets for c in clist]

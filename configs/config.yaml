@@ -4,7 +4,7 @@ defaults:
 processing:
   device: cuda
   image_width: 180
-  image_height: 50 #50
+  image_height: 50 
   
 training:
   lr: 3e-4
@@ -18,8 +18,8 @@ bools:
   SAVE_CHECKPOINTS: false
 
 paths:
-  dataset_dir: ./dataset_2
-  save_model_as: ./logs/crnn_receita_app.pth
+  dataset_dir: ./dataset
+  save_model_as: ./logs/crnn.pth
 
 model:
   use_attention: true 
