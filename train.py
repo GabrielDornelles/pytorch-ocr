@@ -46,7 +46,7 @@ def run_training(cfg):
     print(f"Configurations:\n{OmegaConf.to_yaml(cfg)}")
 
     # 1. Dataset and dataloaders
-    image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.png"))
+    image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.jpg"))
     original_targets = [x.split("/")[-1][:-4].replace("-copy", "") for x in image_files]
     targets = [[c for c in x] for x in original_targets]
     targets_flat = [c for clist in targets for c in clist]
@@ -67,17 +67,23 @@ def run_training(cfg):
         image_paths=train_imgs,
         targets=train_targets,
         resize=(cfg.processing.image_height, cfg.processing.image_width),
+        grayscale=cfg.model.grayscale
     )
+
+    
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=cfg.training.batch_size,
         num_workers=cfg.training.num_workers,
         shuffle=True,
     )
+
+ 
     test_dataset = dataset.ClassificationDataset(
         image_paths=test_imgs,
         targets=test_targets,
         resize=(cfg.processing.image_height, cfg.processing.image_width),
+        grayscale=cfg.model.grayscale
     )
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
@@ -96,7 +102,8 @@ def run_training(cfg):
     model = CRNN(dims=cfg.model.dims, 
         num_chars=len(label_encoder.classes_), 
         use_attention=cfg.model.use_attention, 
-        use_ctc=cfg.model.use_ctc)
+        use_ctc=cfg.model.use_ctc,
+        grayscale=cfg.model.grayscale)
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.lr)

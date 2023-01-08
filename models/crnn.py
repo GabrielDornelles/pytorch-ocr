@@ -18,7 +18,8 @@ class CRNN(nn.Module):
     def __init__(self, dims: int = 256, 
                 num_chars: int = 35,
                 use_attention: bool = True, 
-                use_ctc: bool = True):
+                use_ctc: bool = True,
+                grayscale: bool = False):
         super().__init__()
         self.use_ctc = use_ctc
         self.use_attention = use_attention
@@ -28,6 +29,9 @@ class CRNN(nn.Module):
 
         # feature extraction
         self.convnet = resnet18(weights=ResNet18_Weights.DEFAULT)
+        if grayscale:
+            self.convnet.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+       
         self.linear = nn.Linear(832, dims)
         self.drop = nn.Dropout(0.5)
 
@@ -68,7 +72,7 @@ class CRNN(nn.Module):
         """
         features = self.encode(images)
         hiddens, _ = self.lstm(features) # [1,45,256]: batch_size, sequence_length, hidden_dim
-        #hiddens, _ = self.self_attn(features)
+        
         if self.use_attention:
             attention , _ = self.attention(hiddens, features) # torch.size([1,45,256]), 45 is the sequence length
             x = hiddens * attention
@@ -149,7 +153,8 @@ if __name__ == "__main__":
     model = CRNN(dims=256,
         num_chars=35, 
         use_attention=True,
-        use_ctc=True
+        use_ctc=True,
+        grayscale=False
     )
 
     output = model(x)

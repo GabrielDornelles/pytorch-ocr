@@ -4,13 +4,13 @@ defaults:
 processing:
   device: cuda
   image_width: 180
-  image_height: 50
+  image_height: 50 #50
   
 training:
   lr: 3e-4
   batch_size: 8
   num_workers: 4
-  num_epochs: 200
+  num_epochs: 100
 
 bools:
   DISPLAY_ONLY_WRONG_PREDICTIONS: true
@@ -18,12 +18,12 @@ bools:
   SAVE_CHECKPOINTS: false
 
 paths:
-  dataset_dir: ./dataset
-  save_model_as: ./logs/crnn.pth
+  dataset_dir: ./dataset_2
+  save_model_as: ./logs/crnn_receita_app.pth
 
 model:
   use_attention: true 
   use_ctc: true
+  gray_scale: false
   dims: 256
-
   
