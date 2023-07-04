@@ -72,10 +72,10 @@ python3 train.py
 
 ## Will Support:
 - Other backbones
-- Self Attention instead of old RNNs?
+- Text detection models(would you like it?)
 
 # TODO:
 - ~~Add logging with hydra, so it saves logging in text files~~. ✅
-- Add CI with github actions, to test if everything works fine after pushes to this repo.
-- Add tests to main methods so it keeps secure when adding more models and functionalities in the future.
+- ~~Add CI with github actions, to test if everything works fine after pushes to this repo~~. ✅
+- ~~Add tests to main methods so it keeps secure when adding more models and functionalities in the future.~~ Partially added. ✅
 - Configure Dockerfile for inference

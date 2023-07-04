@@ -9,7 +9,7 @@ exclude = '''
   | \.hg
   | \.mypy_cache
   | \.tox
-  | \.venv
+  | venv
   | docs
   | _build
   | buck-out
