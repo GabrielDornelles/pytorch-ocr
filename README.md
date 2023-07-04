@@ -1,8 +1,6 @@
 # TorchNN-OCR
 
-
-
-A PyTorch simple framework to train Optical Character Recognition (OCR) models. 
+A simple PyTorch framework to train Optical Character Recognition (OCR) models. 
 
 You can train models to read **captchas**, **license plates**, **digital displays**, and any type of text!
 
@@ -19,13 +17,20 @@ See:
   <img src="https://user-images.githubusercontent.com/56324869/206952565-1da49dc0-d3ee-4328-8855-19f62aafb435.png" />
 </p>
 
-# Hydra Logs!
+# Hydra!
 You have the whole **Training Log** in a train.log file so you can process it anywhere!
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/56324869/207184241-855019e3-889d-4c2d-ae11-62dd73f62352.png"/>
 </p>
 
+
+You can also run multiple training runs with Hydra:
+```sh
+python3 train.py --multirun model.use_attention=true,false model.use_ctc=true,false training.num_epochs=50,100
+```
+
+This example will run 8 different trainings with each configuration.
 
 # How to train?
 
@@ -61,8 +66,9 @@ python3 train.py
 ## Support:
 
 - CRNNs ✅
-- Attention + CTC Loss ✅ 
-- Attention + Cross Entropy Loss ✅
+- Attention ✅
+- CTC Loss ✅ 
+- Cross Entropy Loss ✅
 
 ## Will Support:
 - Other backbones
@@ -72,4 +78,4 @@ python3 train.py
 - ~~Add logging with hydra, so it saves logging in text files~~. ✅
 - Add CI with github actions, to test if everything works fine after pushes to this repo.
 - Add tests to main methods so it keeps secure when adding more models and functionalities in the future.
-- Configure Dockerfile to work with nvidia gpu for training.
+- Configure Dockerfile for inference

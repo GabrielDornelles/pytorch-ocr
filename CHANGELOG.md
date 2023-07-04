@@ -1,5 +1,17 @@
 # Changelog 
 
+## [1.0.4] - 03/07/2023
+
+### Changed
+- The repository has been rewritten in a cleaner way. A huge part of code has been moved to `utils`, between `data_loading` and `logging_config`.
+- Linear layer (Convnet <> Gru communication) size is now calculated at model `__init__.py` and not hardcoded as it was.
+
+### Added
+- A pre-commit was added including `black` and `flake8` for the moment.
+- Tests were heavily implemented for model init, forward, backward and ctc/cross-entropy loss.
+- Test for `decode_predictions` (ctc version).
+- Any resolution is now supported by the model.
+
 ## [1.0.3] - 03/01/2023
 ### Highlight
 
