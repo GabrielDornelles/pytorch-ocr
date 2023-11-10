@@ -3,13 +3,13 @@ defaults:
   
 processing:
   device: cuda
-  image_width: 180
-  image_height: 50 
+  image_width: 250
+  image_height: 60 
   
 training:
   lr: 3e-4
-  batch_size: 8
-  num_workers: 4
+  batch_size: 16
+  num_workers: 8
   num_epochs: 100
 
 bools:

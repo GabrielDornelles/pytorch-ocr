@@ -5,62 +5,31 @@ from PIL import Image
 
 from models.crnn import CRNN
 from utils.model_decoders import decode_predictions, decode_padded_predictions
+from torchvision import transforms
+
+transform = transforms.Compose([
+    transforms.Grayscale(),
+    transforms.ToTensor(),
+])
 
 # I use "∅" to denote the blank token. This list is automatically generated at training,
 # but I recommend that you hardcode your characters at evaluation
-classes = [
-    "∅",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "i",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "o",
-    "p",
-    "q",
-    "r",
-    "s",
-    "t",
-    "u",
-    "v",
-    "w",
-    "x",
-    "y",
-    "z",
-]
-
+classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'c', 'd', 'e', 'g', 'h', 'k', 'n', 'o', 'p', 'q', 's', 'u', 'v', 'x', 'y', 'z']
 
 def inference(image_path):
     # Hardcoded resize
     image = Image.open(image_path).convert("RGB")
-    image = image.resize((180, 50), resample=Image.BILINEAR)
+    image = image.resize((250, 60), resample=Image.BILINEAR)
+    image = transform(image)
     image = np.array(image)
 
     # ImageNet mean and std (not required, but if you trained with, keep it)
-    mean = (0.485, 0.456, 0.406)
-    std = (0.229, 0.224, 0.225)
-    aug = albumentations.Compose([albumentations.Normalize(mean, std, max_pixel_value=255.0, always_apply=True)])
+    # mean = (0.485, 0.456, 0.406)
+    # std = (0.229, 0.224, 0.225)
+    # aug = albumentations.Compose([albumentations.Normalize(mean, std, max_pixel_value=255.0, always_apply=True)])
 
-    image = aug(image=image)["image"]
-    image = np.transpose(image, (2, 0, 1)).astype(np.float32)
+    # image = aug(image=image)["image"]
+    # image = np.transpose(image, (2, 0, 1)).astype(np.float32)
     image = image[None, ...]
     image = torch.from_numpy(image)
     if str(device) == "cuda":
@@ -78,7 +47,14 @@ def inference(image_path):
 
 if __name__ == "__main__":
     # Setup model and load weights
-    model = CRNN(dims=256, num_chars=35, use_attention=True, use_ctc=True)
+    model = CRNN(
+        resolution=(250, 60),
+        dims=256,
+        num_chars=len(classes),
+        use_attention=True,
+        use_ctc=True,
+        grayscale=True,
+    )
     device = torch.device("cuda")
     model.to(device)
     model.load_state_dict(torch.load("./logs/crnn.pth"))
