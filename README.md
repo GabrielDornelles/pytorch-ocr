@@ -17,6 +17,13 @@ See:
   <img src="https://user-images.githubusercontent.com/56324869/206952565-1da49dc0-d3ee-4328-8855-19f62aafb435.png" />
 </p>
 
+# Pre-requisites
+
+1. if you're using Windows OS, install [CUDA](https://developer.nvidia.com/cuda-toolkit-archive) according to Python, [Pytorch](https://pytorch.org/get-started/previous-versions/) and [Torch vision](https://pypi.org/project/torchvision/) versions compliance.
+  - e.g. python==3.10.13 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6
+2. install the rest of dependencies: `pip install -r requirements.txt`
+  - if you encounter issues with numpy package import, just reinstall it; it's a known issue
+
 # Hydra!
 You have the whole **Training Log** in a train.log file so you can process it anywhere!
 
