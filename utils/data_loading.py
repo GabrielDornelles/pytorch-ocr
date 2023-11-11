@@ -58,7 +58,8 @@ class ClassificationDataset:
 
 def build_dataloaders(cfg):
     image_files = glob.glob(os.path.join(cfg.paths.dataset_dir, "*.png"))
-    original_targets = [x.split("/")[-1][:-4].replace("-copy", "") for x in image_files]
+    # get file label using os, fix windows double backslash issue
+    original_targets = [os.path.splitext(os.path.basename(x))[0] for x in image_files]
     targets = [[c for c in x] for x in original_targets]
     targets_flat = [c for clist in targets for c in clist]
     label_encoder = preprocessing.LabelEncoder()
